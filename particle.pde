@@ -6,6 +6,7 @@ class Particle {
   PVector velocity;
   PVector acceleration;
   float maxSpeed;
+  float maxForce;
   float angle;
   
   //particle properties
@@ -24,11 +25,14 @@ class Particle {
     
     mass = random(2,9);
     size = mass;
-    life = 120;
+    life = 100;
     maxSpeed = 10;
+    maxForce = 2;
     
-    lineColour = colors[(int)random(4)];
-    fillColour = colors[(int)random(4)];
+    int int1 = (int)random(3);
+    int int2 = (int1 + (int)random(1,3))%4;
+    lineColour = colors[int1];
+    fillColour = colors[int2];
   }
   
   void display() {
@@ -58,6 +62,28 @@ class Particle {
     life -=1;
   }
   
+  void getAttracted(Mass a) {
+    PVector force = PVector.sub(a.position, position);
+    float mag = force.mag();
+    if(mag > 0) {
+      force.normalize();
+      force.div(mag*mag);
+      force.mult(a.mass);
+      applyForce(force);
+    }
+  }
+  
+  void getRepelled(Mass b) {
+    PVector force = PVector.sub(position, b.position);
+    float mag = force.mag();
+    if(mag > 0) {
+      force.normalize();
+      force.div(mag*mag);
+      force.mult(b.mass);
+      applyForce(force);
+    }
+  }
+  
   void run() {
     //perform all actions a particle must take
     update();
@@ -75,6 +101,11 @@ class Particle {
   
   void applyForce(PVector force) {
     //apply a force as an acceleration
+    acceleration.add(force.copy().limit(maxForce).div(mass));
+  }
+  
+  void applyImpulse(PVector force) {
+    //apply an unlimited force as an acceleration
     acceleration.add(force.copy().div(mass));
   }
 }

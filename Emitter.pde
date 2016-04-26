@@ -20,7 +20,7 @@ class Emitter{
   void addParticle(PVector force) {
     //create and add a new particle 
     Particle p = new Particle(position.x, position.y);
-    p.applyForce(force);
+    p.applyImpulse(force);
     particles.add(p);
   }
   
@@ -32,6 +32,23 @@ class Emitter{
     
     while (iterator.hasNext() ) {
       Particle p = iterator.next();
+      p.run();
+      if (p.isDead() ) {
+        iterator.remove(); 
+      }
+    }
+  }
+  
+  void runParticles(Mass a, Mass r) {
+    //update and display particles
+    //dead particles are to be removed
+    //iterator allows particles to removed while iterating
+    Iterator<Particle> iterator = particles.iterator();
+    
+    while (iterator.hasNext() ) {
+      Particle p = iterator.next();
+      p.getAttracted(a);
+      p.getRepelled(r);
       p.run();
       if (p.isDead() ) {
         iterator.remove(); 
